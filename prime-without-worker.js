@@ -1,7 +1,7 @@
 const startTime = Date.now();
 const fs = require("fs");
 
-let num = 10000;
+let num = 1000000;
 
 console.log(`\nThe num is: ${num}`);
 

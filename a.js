@@ -1,30 +1,42 @@
-let num = 1000;
-console.log("The enter the num is " + num);
 const { Worker } = require("worker_threads");
 
-const worker = new Worker("./aa.js", { workerData: { num } });
+const num = 10000000;
+const numThreads = 2;
+const rangePerThread = Math.ceil(num / numThreads);
+
+console.log("The entered num is " + num);
 
 let primeCount = 0;
 let executionTime = 0;
+let finishedThreads = 0;
 
-worker.on("message", (message) => {
-  if (typeof message === "object" && "executionTime" in message) {
-    executionTime = message.executionTime;
-  } else if (typeof message === "number") {
-    primeCount = message;
-    console.log(
-      `The total count of prime numbers up to the num is ${primeCount}`
-    );
+function handleWorkerMessage(message) {
+  if (typeof message === "number") {
+    primeCount += message;
+  } else if (typeof message === "object" && "executionTime" in message) {
+    executionTime = Math.max(executionTime, message.executionTime);
+  }
+}
+
+function handleWorkerExit() {
+  finishedThreads++;
+
+  // Check if all workers have finished
+  if (finishedThreads === numThreads) {
     console.log(`Execution time: ${executionTime} milliseconds`);
+    console.log(`The total count of prime numbers up to the num is ${primeCount}`);
   }
-});
+}
 
-worker.on("error", (error) => {
-  console.error(`Worker error: ${error}`);
-});
+for (let i = 0; i < numThreads; i++) {
+  const start = i * rangePerThread + 2;
+  const end = Math.min((i + 1) * rangePerThread, num);
 
-worker.on("exit", (code) => {
-  if (code !== 0) {
-    console.error(`Worker stopped with exit code ${code}`);
-  }
-});
+  const worker = new Worker("./aa.js", { workerData: { start, end } });
+
+  worker.on("message", handleWorkerMessage);
+  worker.on("error", (error) => {
+    console.error(`Worker error: ${error}`);
+  });
+  worker.on("exit", handleWorkerExit);
+}
