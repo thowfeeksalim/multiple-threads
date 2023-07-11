@@ -1,7 +1,7 @@
 const { Worker } = require("worker_threads");
-
-const num = 10000000;
-const numThreads = 100;
+let num 
+num = console.log('Enter the num : '+num);
+const numThreads = 10;
 const rangePerThread = Math.ceil(num / numThreads);
 
 console.log("The entered num is " + num);
@@ -32,7 +32,7 @@ for (let i = 0; i < numThreads; i++) {
   const start = i * rangePerThread + 2;
   const end = Math.min((i + 1) * rangePerThread, num);
 
-  const worker = new Worker("./aa.js", { workerData: { start, end } });
+  const worker = new Worker("./multiple-threads2.js", { workerData: { start, end } });
 
   worker.on("message", handleWorkerMessage);
   worker.on("error", (error) => {
