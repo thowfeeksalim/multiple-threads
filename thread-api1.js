@@ -1,17 +1,15 @@
-const express = require("express");
 const { Worker } = require("worker_threads");
+const express = require("express");
 
-const app = express();
 const port = 3000;
+const numThreads = 1;
+const app = express();
 
 app.use(express.json());
 
-app.post("/prime", (req, res) => {
-  const numThreads = 1;
+app.post("/prime", async (req, res) => {
   const { num } = req.body;
   const rangePerThread = Math.ceil(num / numThreads);
-
-//   console.log("The entered num is " + num);
 
   let primeCount = 0;
   let executionTime = 0;
@@ -25,17 +23,12 @@ app.post("/prime", (req, res) => {
     }
   }
 
-  function handleWorkerExit() {
+  async function handleWorkerExit() {
     finishedThreads++;
 
-    // Check if all workers have finished
     if (finishedThreads === numThreads) {
-      //   console.log(`Entered num is ` + num);
-      //   console.log(`Execution time: ${executionTime} milliseconds`);
-      //   console.log(`The total count of prime numbers up to the num is ${primeCount}`);
-
       res.json({
-        primeCount,
+        primeCount
       });
     }
   }
@@ -44,7 +37,7 @@ app.post("/prime", (req, res) => {
     const start = i * rangePerThread + 2;
     const end = Math.min((i + 1) * rangePerThread, num);
 
-    const worker = new Worker("./multiple-threads2.js", {
+    const worker = new Worker("./thread-api2.js", {
       workerData: { start, end },
     });
 
@@ -52,10 +45,21 @@ app.post("/prime", (req, res) => {
     worker.on("error", (error) => {
       console.error(`Worker error: ${error}`);
     });
-    worker.on("exit", handleWorkerExit);
+
+    // Promisify the exit event
+    await new Promise((resolve) => {
+      worker.on("exit", () => {
+        handleWorkerExit();
+        resolve();
+      });
+    });
   }
 });
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+
+
+

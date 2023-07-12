@@ -1,6 +1,6 @@
 const { Worker } = require("worker_threads");
 let num 
-num = console.log('Enter the num : '+num);
+num = console.log('Enter the num : '+ num);
 const numThreads = 10;
 const rangePerThread = Math.ceil(num / numThreads);
 
