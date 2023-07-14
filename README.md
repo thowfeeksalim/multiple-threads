@@ -78,7 +78,7 @@ This code sets up an Express server that listens for POST requests to the `/prim
 
 ### Code Snippet 2: Without Worker Threads
 
-The second code snippet (`load-test.js`) performs the prime number calculation task without using worker threads. Here's a breakdown of the code:
+The second code snippet performs the prime number calculation task without using worker threads. Here's a breakdown of the code:
 
 ```javascript
 const express = require("express");
