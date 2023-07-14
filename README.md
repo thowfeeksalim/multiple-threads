@@ -342,3 +342,10 @@ Based on the load test results, the following conclusions can be drawn:
   - The performance was stable, with no significant variations observed.
 
 In conclusion, utilizing worker threads in the first code snippet (`multiple-requests1.js`) improved the performance of the prime number calculation task. It allowed for parallel execution, resulting in a faster response time and the ability to handle higher numbers of requests. The load test results showed better performance metrics compared to the second code snippet, which executed the task without worker threads.
+
+<br>
+<br>
+<p align="center">           
+<img src="https://www.wikitechy.com/tutorials/csharp/img/c-sharp-images/c-sharp-multithreading.gif">
+</p>
+
