@@ -24,11 +24,11 @@
 
 ### Summary
 
-This repository demonstrates the use of worker threads in Node.js to improve the performance of a prime number calculation task. It includes two code snippets: one that utilizes worker threads (`multiple-requests2.js`) and another that doesn't (`load-test.js`). The load tests were conducted using two different methods to compare their performance.
+This repository demonstrates the use of worker threads in Node.js to improve the performance of a prime number calculation task. It includes two code snippets: one that utilizes worker threads (`worker.js`). The load tests were conducted using two different methods to compare their performance.
 
 ### Code Snippet 1: Using Worker Threads
 
-The first code snippet (`multiple-requests2.js`) utilizes worker threads to perform the prime number calculation task in a parallel manner. Here's a breakdown of the code:
+The first code snippet (`multiple-requests1.js`) utilizes worker threads to perform the prime number calculation task in a parallel manner. Here's a breakdown of the code:
 
 ```javascript
 const { Worker } = require("worker_threads");
@@ -55,7 +55,7 @@ app.post("/prime", async (req, res) => {
   }
 
   // Creating a worker thread
-  const worker = new Worker(".//multiple-requests2.js", {
+  const worker = new Worker(".//worker.js", {
     workerData: { start, end },
   });
 
@@ -78,7 +78,7 @@ app.listen(port, () => {
 });
 ```
 
-This code sets up an Express server that listens for POST requests to the `/prime` endpoint. When a request is received, it extracts the input number, initializes variables for counting prime numbers and tracking execution time, and creates a worker thread using `Worker` from the `worker_threads` module. The worker thread runs the task in the separate JavaScript file `multiple-requests2.js`. The main thread listens for messages from the worker and updates the `primeCount` and `executionTime` variables accordingly. Once the worker thread exits, the server responds with the `primeCount` value.
+This code sets up an Express server that listens for POST requests to the `/prime` endpoint. When a request is received, it extracts the input number, initializes variables for counting prime numbers and tracking execution time, and creates a worker thread using `Worker` from the `worker_threads` module. The worker thread runs the task in the separate JavaScript file `worker.js`. The main thread listens for messages from the worker and updates the `primeCount` and `executionTime` variables accordingly. Once the worker thread exits, the server responds with the `primeCount` value.
 
 ### Code Snippet 2: Without Worker Threads
 
@@ -278,4 +278,4 @@ Based on the load test results, the following conclusions can be drawn:
   - The load test was performed with a consistent 100 VUs.
   - The performance was stable, with no significant variations observed.
 
-In conclusion, utilizing worker threads in the first code snippet (`multiple-requests2.js`) improved the performance of the prime number calculation task. It allowed for parallel execution, resulting in a faster response time and the ability to handle higher numbers of requests. The load test results showed better performance metrics compared to the second code snippet (`load-test.js`), which executed the task without worker threads.
+In conclusion, utilizing worker threads in the first code snippet (`worker.js`) improved the performance of the prime number calculation task. It allowed for parallel execution, resulting in a faster response time and the ability to handle higher numbers of requests. The load test results showed better performance metrics compared to the second code snippet (`load-test.js`), which executed the task without worker threads.
