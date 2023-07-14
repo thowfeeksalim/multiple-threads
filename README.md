@@ -1,8 +1,7 @@
 
-<h1 align="center"> <strong> multiple-threads </strong> </h1> 
+<h1 align="center"> <strong>🧵 Multiple Threads🧵 </strong> </h1> 
 <p align="center">
   <p align="center">
-    
     <br />
     <a href="#about-the-project"><strong>Explore the docs »</strong></a>
     <br />
@@ -14,12 +13,9 @@
     <a href="https://github.com/thowfeeksalim/multiple-threads/issues">Request Feature</a>
   </p>
 </p>
-<p align="center">            
-<img src="https://nodesource.com/blog/worker-threads-nodejs">
+<p align="center">           
+<img src="https://images.ctfassets.net/hspc7zpa5cvq/20h5efXHT4bQbuf44mdq2H/a40944191d031217a9169b17a8ef35d6/worker-diagram_2x__1_.jpg">
 </p>
-
-
-
 
 
 ### Summary
