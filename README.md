@@ -39,6 +39,7 @@ To run this project locally, follow these steps:
 <p align="center">           
 <img src="https://images.ctfassets.net/hspc7zpa5cvq/20h5efXHT4bQbuf44mdq2H/a40944191d031217a9169b17a8ef35d6/worker-diagram_2x__1_.jpg">
 </p>
+
 # Load Test Comparison
 
 This repository contains two different implementations of a load test for a prime number calculation API. The load tests were executed using the k6 load testing tool. Below is a comparison of the two load tests and their conclusions.
@@ -95,7 +96,7 @@ app.listen(port, () => {
 
 ```
 
-##worker.js
+### worker.js
 
 ```javascript
 
@@ -282,7 +283,7 @@ function isPrimeNumber(num) {
 
 
 ```
-##Loadtest.js
+### Loadtest.js
 
 ```javascript
 
@@ -395,11 +396,11 @@ By comparing the two load tests, we can draw the following conclusions:
 8. Load Test 2 had a higher average HTTP request waiting time compared to Load Test 1.
 9. Load Test 1 had a higher average iteration duration compared to Load Test 2.
 10. Load Test 2 had a higher average iteration rate compared to Load Test 1.
-11. Both load tests utilized 100 virtual users (VUs) throughout the test, but Load Test 1 had a varying number of VUs ranging from 
+11. Both load tests utilized 100 virtual users (VUs) throughout the test, but Load Test 1 had a varying number of VUs ranging from 41 to 100.
 
-41 to 100.
+# conclusion
 
-In conclusion, Load Test 1 using Worker Threads demonstrated better performance in terms of lower response times and lower resource utilization compared to Load Test 2 without using Worker Threads. However, Load Test 2 achieved a higher iteration rate, which indicates higher throughput. The choice between the two implementations depends on the specific requirements and trade-offs of the application under test.
+Load Test 1 using Worker Threads demonstrated better performance in terms of lower response times and lower resource utilization compared to Load Test 2 without using Worker Threads. However, Load Test 2 achieved a higher iteration rate, which indicates higher throughput. The choice between the two implementations depends on the specific requirements and trade-offs of the application under test.
 <br>
 <br>
 <p align="center">           
