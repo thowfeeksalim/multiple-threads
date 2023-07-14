@@ -19,7 +19,7 @@ app.post("/prime", async (req, res) => {
     }
   }
 
-  const worker = new Worker(".//multiple-requests2.js", {
+  const worker = new Worker(".//worker.js", {
     workerData: { start, end },
   });
 
