@@ -13,6 +13,29 @@
     <a href="https://github.com/thowfeeksalim/multiple-threads/issues">Request Feature</a>
   </p>
 </p>
+
+This is a Node.js project that demonstrates how to use multiple threads in JavaScript to achieve parallel processing.
+
+## Description
+
+The purpose of this project is to showcase how to leverage the power of multiple threads in Node.js to perform computationally intensive tasks concurrently. It provides a simple example of creating and managing worker threads to distribute workload and improve overall performance.
+
+## Features
+
+- Creates multiple worker threads to execute tasks in parallel.
+- Demonstrates how to communicate between the main thread and worker threads using messaging.
+- Implements a basic load balancing strategy to distribute work evenly across threads.
+- Provides an example of using thread pools to efficiently manage resources.
+
+## Installation
+
+To run this project locally, follow these steps:
+
+1. Clone the repository:
+
+   ```bash
+   git clone https://github.com/thowfeeksalim/multiple-threads.git
+
 <p align="center">           
 <img src="https://images.ctfassets.net/hspc7zpa5cvq/20h5efXHT4bQbuf44mdq2H/a40944191d031217a9169b17a8ef35d6/worker-diagram_2x__1_.jpg">
 </p>
