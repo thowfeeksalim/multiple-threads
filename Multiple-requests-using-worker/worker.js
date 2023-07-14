@@ -9,7 +9,7 @@ function findPrimeNumbers(start, end) {
       primes.push(i);
     }
   }
-  //fs.writeFileSync("aaa.txt", primes.join("\n"));
+  
   return primes;
 }
 

@@ -39,17 +39,16 @@ To run this project locally, follow these steps:
 <p align="center">           
 <img src="https://images.ctfassets.net/hspc7zpa5cvq/20h5efXHT4bQbuf44mdq2H/a40944191d031217a9169b17a8ef35d6/worker-diagram_2x__1_.jpg">
 </p>
+# Load Test Comparison
 
+This repository contains two different implementations of a load test for a prime number calculation API. The load tests were executed using the k6 load testing tool. Below is a comparison of the two load tests and their conclusions.
 
-### Summary
+## Load Test 1: Using Worker Threads
 
-This repository demonstrates the use of worker threads in Node.js to improve the performance of a prime number calculation task. It includes two code snippets: one that utilizes worker threads (`worker.js`). The load tests were conducted using two different methods to compare their performance.
-
-### Code Snippet 1: Using Worker Threads
-
-The first code snippet (`multiple-requests1.js`) utilizes worker threads to perform the prime number calculation task in a parallel manner. Here's a breakdown of the code:
+### Code Snippet 
 
 ```javascript
+
 
 const { Worker } = require("worker_threads");
 const express = require("express");
@@ -58,14 +57,12 @@ const app = express();
 app.use(express.json());
 
 app.post("/prime", async (req, res) => {
-  // Extracting input data
   const { num } = req.body;
   const start = 2;
   const end = num;
   let primeCount = 0;
   let executionTime = 0;
 
-  // Function to handle worker messages
   function handleWorkerMessage(message) {
     if (typeof message === "number") {
       primeCount += message;
@@ -74,18 +71,15 @@ app.post("/prime", async (req, res) => {
     }
   }
 
-  // Creating a worker thread
   const worker = new Worker(".//worker.js", {
     workerData: { start, end },
   });
 
-  // Event listeners for worker
   worker.on("message", handleWorkerMessage);
   worker.on("error", (error) => {
     console.error(`Worker error: ${error}`);
   });
 
-  // Event listener for worker exit
   worker.on("exit", () => {
     res.json({
       primeCount,
@@ -96,10 +90,15 @@ app.post("/prime", async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+
+
 ```
+
+##worker.js
+
 ```javascript
 
-----------------------worker.js------------------------------
 
 const { parentPort, workerData } = require("worker_threads");
 //const fs = require("fs");
@@ -112,7 +111,7 @@ function findPrimeNumbers(start, end) {
       primes.push(i);
     }
   }
-
+  
   return primes;
 }
 
@@ -139,39 +138,112 @@ const executionTime = Date.now() - startTime;
 
 parentPort.postMessage(primeCount);
 parentPort.postMessage({ executionTime });
+
+
+
 ```
 
-This code sets up an Express server that listens for POST requests to the `/prime` endpoint. When a request is received, it extracts the input number, initializes variables for counting prime numbers and tracking execution time, and creates a worker thread using `Worker` from the `worker_threads` module. The worker thread runs the task in the separate JavaScript file `worker.js`. The main thread listens for messages from the worker and updates the `primeCount` and `executionTime` variables accordingly. Once the worker thread exits, the server responds with the `primeCount` value.
 
-### Code Snippet 2: Without Worker Threads
+### Load Test Configuration
 
-The second code snippet performs the prime number calculation task without using worker threads. Here's a breakdown of the code:
+```
+k6 run --vus 100 --duration 30s Loadtest.js
+```
+
+### Load Test Conclusions
 
 ```javascript
+
+
+          /\      |‾‾| /‾‾/   /‾‾/
+     /\  /  \     |  |/  /   /  /
+    /  \/    \    |     (   /   ‾‾\
+   /          \   |  |\  \ |  (‾)  |
+  / __________ \  |__| \__\ \_____/ .io
+
+  execution: local
+     script: Loadtest.js
+     output: -
+
+  scenarios: (100.00%) 1 scenario, 100 max VUs, 1m0s max duration (incl. graceful stop):
+           * default: 100 looping VUs for 30s (gracefulStop: 30s)
+
+
+     ✓ is status 200
+
+     checks.........................: 100.00% ✓ 646       ✗ 0
+     data_received..................: 162 kB  4.8 kB/s
+     data_sent......................: 77 kB   2.3 kB/s
+     http_req_blocked...............: avg=2.69ms   min=0s    med=0s    max=33.46ms p(90)=13.3ms   p(95)=26.21ms
+     http_req_connecting............: avg=2.43ms   min=0s    med=0s    max=30.42ms p(90)=12.8ms   p(95)=19.77ms
+     http_req_duration..............: avg=5.05s    min=2.63s med=4.94s max=7.87s   p(90)=7.27s    p(95)=7.69s
+       { expected_response:true }...: avg=5.05s    min=2.63s med=4.94s max=7.87s   p(90)=7.27s    p(95)=7.69s
+     http_req_failed................: 0.00%   ✓ 0         ✗ 646
+     http_req_receiving.............: avg=129.82µs min=0s    med=0s    max=4ms     p(90)=974.05µs p(95)=1ms
+     http_req_sending...............: avg=211.95µs min=0s    med=0s    max=76.96ms p(90)=282.65µs p(95)=997.4µs
+     http_req_tls_handshaking.......: avg=0s       min=0s    med=0s    max=0s      p(90)=0s       p(95)=0s
+     http_req_waiting...............: avg=5.05s    min=2.63s med=4.94s max=7.87s   p(90)=7.27s    p(95)=7.69s
+     http_reqs......................: 646     19.169361/s
+     iteration_duration.............: avg=5.06s    min=2.67s med=4.95s max=7.87s   p(90)=7.27s    p(95)=7.71s
+     iterations.....................: 646     19.169361/s
+     vus............................: 41      min=41      max=100
+     vus_max........................: 100     min=100     max=100
+
+
+running (0m33.7s), 000/100 VUs, 646 complete and 0 interrupted iterations
+default ✓ [======================================] 100 VUs  30s
+
+
+```
+
+
+- The load test was executed using the script "Loadtest.js" with local execution.
+- One scenario was defined, which utilized 100 virtual users (VUs) and had a maximum duration of 30 seconds, including a graceful stop after 30 seconds.
+- The test passed with a status code of 200 for all requests.
+- 100% of the checks passed, with 646 checks executed and no failures.
+- Data received: 162 kB at a rate of 4.8 kB/s.
+- Data sent: 77 kB at a rate of 2.3 kB/s.
+- Average HTTP request blocked time: 2.69 ms, with a minimum of 0s and maximum of 33.46 ms.
+- Average HTTP request connecting time: 2.43 ms, with a minimum of 0s and maximum of 30.42 ms.
+- Average HTTP request duration: 5.05 seconds, with a minimum of 2.63 seconds and maximum of 7.87 seconds.
+- Average expected response time: 5.05 seconds, with a minimum of 2.63 seconds and maximum of 7.87 seconds.
+- No failed HTTP requests: 0% failure rate with 0 failed requests out of 646.
+- Average HTTP request receiving time: 129.82 µs, with a minimum of 0s and maximum of 4 ms.
+- Average HTTP request sending time: 211.95 µs, with a minimum of 0s and maximum of 76.96 ms.
+- No TLS handshaking time observed.
+- Average HTTP request waiting time: 5.05 seconds, with a minimum of 2.63 seconds and maximum of 7.87 seconds.
+- Total HTTP requests made: 646, with an average rate of 19.169361/s.
+- Average iteration duration: 5.06 seconds, with a minimum of 2.67 seconds and maximum of 7.87 seconds.
+- Total iterations: 646, with an average rate of 19.169361/s.
+- Virtual Users (VUs): Ranged from 41 to a maximum of 100 VUs.
+- Maximum VUs reached: 100, with a minimum of 100 and maximum of 100.
+
+## Load Test 2: Without Using Worker Threads
+
+### Code Snippet
+
+```javascript
+
+
 const express = require("express");
 const port = 5000;
 const app = express();
 app.use(express.json());
 
 app.post("/prime", (req, res) => {
-  // Extracting input data
   const { num } = req.body;
   const start = 2;
   const end = num;
   let primeCount = 0;
   let executionTime = 0;
 
-  // Timing the execution
   const startTime = Date.now();
 
-  // Calculating prime numbers
   const primes = findPrimeNumbers(start, end);
   primeCount = primes.length;
 
-  // Calculating execution time
   executionTime = Date.now() - startTime;
 
-  // Responding with the result
   res.json({
     primeCount,
   });
@@ -206,143 +278,128 @@ function isPrimeNumber(num) {
 
   return true;
 }
+
+
+
+```
+##Loadtest.js
+
+```javascript
+
+
+
+import http from "k6/http";
+import { check } from "k6";
+
+export default function () {
+    const url = "http://localhost:5000/prime"
+
+    const payload = JSON.stringify({ num: 10000 });
+    const response = http.post(url, payload);
+
+    check(response ,{
+      "is status 200": (r) => r.status === 200,
+    });
+}
+
+
 ```
 
-This code sets up an Express server that listens for POST requests to the `/prime` endpoint. When a request is received, it extracts the input number, initializes variables for counting prime numbers and tracking execution time, and calculates the prime numbers using the `findPrimeNumbers` function. It then responds with the `primeCount` value.
 
-### Load Test Results and Conclusions
+### Load Test Configuration
 
-The load tests were conducted using two different methods: one with worker threads and another without worker threads. Here are the conclusions drawn from the load test results for each method:
+```
+k6 run --vus 100 --duration 30s load-test.js
+```
 
-#### Load Test Results: Using Worker Threads
-
-
+### Load Test Conclusions
 
 
 ```javascript
+
+
+
+          /\      |‾‾| /‾‾/   /‾‾/
+     /\  /  \     |  |/  /   /  /
+    /  \/    \    |     (   /   ‾‾\
+   /          \   |  |\  \ |  (‾)  |
+  / __________ \  |__| \__\ \_____/ .io
+
   execution: local
-     script: Loadtest.js
-     output: -
-     data_sent......................: 86 kB   2.7 kB/s
-     http_req_blocked...............: avg=1.34ms   min=0s    med=0s    max=20.67ms  p(90)=4.14ms   p(95)=12.6ms
-     http_req_connecting............: avg=688.97µs min=0s    med=0s    max=19.4ms   p(90)=2.64ms   p(95)=6.1ms
-     http_req_duration..............: avg=4.29s    min=2.04s med=4.19s max=6.99s    p(90)=5.45s    p(95)=6.03s
-       { expected_response:true }...: avg=4.29s    min=2.04s med=4.19s max=6.99s    p(90)=5.45s    p(95)=6.03s
-     http_req_failed................: 0.00%   ✓ 0         ✗ 726
-     http_req_receiving.............: avg=406.5µs  min=0s    med=0s    max=213.6ms  p(90)=545.9µs  p(95)=1ms
-     http_req_sending...............: avg=1.11ms   min=0s    med=0s    max=653.99ms p(90)=514.29µs p(95)=1.02ms
-     http_req_tls_handshaking.......: avg=0s       min=0s    med=0s    max=0s       p(90)=0s       p(95)=0s
-     http_req_waiting...............: avg=4.29s    min=2.04s med=4.19s max=6.99s    p(90)=5.45s    p(95)=6.03s
-     http_reqs......................: 726     22.440323/s
-     iteration_duration.............: avg=4.29s    min=2.04s med=4.2s  max=7.02s    p(90)=5.45s    p(95)=6.03s
-     iterations.....................: 726     22.440323/s
-     vus............................: 19      min=19      max=100
-     vus_max........................: 100     min=100     max=100
-
-running (0m32.4s), 000/100 VUs, 726 complete and 0 interrupted iterations
-default ✓ [======================================] 100 VUs  30s
-```
-
-
-
-- Data sent: 86 kB at a rate of 2.7 kB/s.
-- HTTP request blocked time: Average of 1.34 ms, with a minimum of 0s and maximum of 20.67 ms.
-- HTTP request connecting time: Average of 688.97 µs, with a minimum of 0s and maximum of 19.4 ms.
-- HTTP request duration: Average of 4.29 seconds, with a minimum of 2.04 seconds and maximum of 6.99 seconds.
-- Expected response time: Average of 4.29 seconds, with a minimum of 2.04 seconds and maximum of 6.99 seconds.
-- No failed HTTP requests: 0% failure rate with 0 failed requests out of 726.
-- HTTP request receiving time: Average of 406.5 µs, with a minimum of 0s and maximum of 213.6 ms.
-- HTTP request sending time: Average of 1.11 ms, with a minimum of 0s and maximum of 653.99 ms.
-- No TLS handshaking time observed.
-- HTTP request waiting time: Average of 4.29 seconds, with a minimum of 2.04 seconds and maximum of 6.99 seconds.
-- Total HTTP requests made: 726, with an average rate of 22.440323/s.
-- Iteration duration: Average of 4.29 seconds, with a minimum of 2.04 seconds and maximum of 7.02 seconds.
-- Total iterations: 726, with an average rate of 22.440323/s.
-- Virtual Users (VUs): Ranged from 19 to a maximum of 100 VUs.
-- Maximum VUs reached: 100, with a minimum of 100 and maximum of 100.
-
-#### Load Test Results: Without Worker Threads
-
-
-
-```javascript
-execution: local
      script: load-test.js
      output: -
 
   scenarios: (100.00%) 1 scenario, 100 max VUs, 1m0s max duration (incl. graceful stop):
            * default: 100 looping VUs for 30s (gracefulStop: 30s)
 
+
      ✓ is status 200
-     checks.........................: 100.00% ✓ 43763       ✗ 0
-     data_received..................: 11 MB   365 kB/s
-     data_sent......................: 5.2 MB  173 kB/s
-     http_req_blocked...............: avg=67.02µs min=0s      med=0s      max=43.66ms  p(90)=0s      p(95)=0s
-     http_req_connecting............: avg=50.72µs min=0s      med=0s      max=43ms     p(90)=0s      p(95)=0s
-     http_req_duration..............: avg=68.29ms min=292.1µs med=62.15ms max=293.99ms p(90)=90.59ms p(95)=100.63ms
-       { expected_response:true }...: avg=68.29ms min=292.1µs med=62.15ms max=293.99ms p(90)=90.59ms p(95)=100.63ms
-     http_req_failed................: 0.00%   ✓ 0           ✗ 43763
-     http_req_receiving.............: avg=88.89µs min=0s      med=0s      max=87.38ms  p(90)=512.9µs p(95)=549µs
-     http_req_sending...............: avg=49.71µs min=0s      med=0s      max=21.78ms  p(90)=0s      p(95)=517µs
-     http_req_tls_handshaking.......: avg=0s      min=0s      med=0s      max=0s       p(90)=0s      p(95)=0s
-     http_req_waiting...............: avg=68.15ms min=0s      med=62.03ms max=293.03ms p(90)=90.43ms p(95)=100.5ms
-     http_reqs......................: 43763   1454.344359/s
-     iteration_duration.............: avg=68.62ms min=808µs   med=62.4ms  max=325.06ms p(90)=90.85ms p(95)=101.02ms
-     iterations.....................: 43763   1454.344359/s
+
+     checks.........................: 100.00% ✓ 34925       ✗ 0
+     data_received..................: 8.8 MB  291 kB/s
+     data_sent......................: 4.2 MB  138 kB/s
+     http_req_blocked...............: avg=386.69µs min=0s      med=0s      max=150.38ms p(90)=0s       p(95)=0s
+     http_req_connecting............: avg=351.83µs min=0s      med=0s      max=145.63ms p(90)=0s       p(95)=0s
+     http_req_duration..............: avg=85.31ms  min=358.3µs med=73.03ms max=362.33ms p(90)=136.64ms p(95)=155.63ms
+       { expected_response:true }...: avg=85.31ms  min=358.3µs med=73.03ms max=362.33ms p(90)=136.64ms p(95)=155.63ms
+     http_req_failed................: 0.00%   ✓ 0           ✗ 34925
+     http_req_receiving.............: avg=128.74µs min=0s      med=0s      max=90.03ms  p(90)=516.59µs p(95)=565.87µs
+     http_req_sending...............: avg=57.48µs  min=0s      med=0s      max=89.1ms   p(90)=0s       p(95)=517.5µs
+     http_req_tls_handshaking.......: avg=0s       min=0s      med=0s      max=0s       p(90)=0s       p(95)=0s
+     http_req_waiting...............: avg=85.12ms  min=148µs   med=72.87ms max=360.57ms p(90)=136.35ms p(95)=154.8ms
+     http_reqs......................: 34925   1159.801814/s
+     iteration_duration.............: avg=85.99ms  min=948.9µs med=73.31ms max=404.04ms p(90)=137.22ms p(95)=156.68ms
+     iterations.....................: 34925   1159.801814/s
      vus............................: 100     min=100       max=100
      vus_max........................: 100     min=100       max=100
 
 
-running (0m30.1s), 000/100 VUs, 43763 complete and 0 interrupted iterations
+running (0m30.1s), 000/100 VUs, 34925 complete and 0 interrupted iterations
 default ✓ [======================================] 100 VUs  30s
+
+
 ```
 
-
-
-
-- Data received: 11 MB at a rate of 365 kB/s.
-- Data sent: 5.2 MB at a rate of 173 kB/s.
-- HTTP request blocked time: Average of 67.02 µs, with a minimum of 0s and maximum of 43.66 ms.
-- HTTP request connecting time: Average of 50.72 µs, with a minimum of 0s and maximum of 43 ms.
-- HTTP request duration: Average of 68.29 ms, with a minimum of 292.1 µs and maximum of 293.99 ms.
-- Expected response time: Average of 68.29 ms, with a minimum of 292.1 µs and maximum of 293.99 ms.
-- No failed HTTP requests: 0
-
-% failure rate with 0 failed requests out of 43,763.
-- HTTP request receiving time: Average of 88.89 µs, with a minimum of 0s and maximum of 87.38 ms.
-- HTTP request sending time: Average of 49.71 µs, with a minimum of 0s and maximum of 21.78 ms.
+- The load test was executed using the script "load-test.js" with local execution.
+- One scenario was defined, which utilized 100 virtual users (VUs) and had a maximum duration of 30 seconds, including a graceful stop after 30 seconds.
+- The test passed with a status code of 200 for all requests.
+- 100% of the checks passed, with 34,925 checks executed and no failures.
+- Data received: 8.8 MB at a rate of 291 kB/s.
+- Data sent: 4.2 MB at a rate of 138 kB/s.
+- Average HTTP request blocked time: 386.69 µs, with a minimum of 0s and maximum of 150.38 ms.
+- Average HTTP request connecting time: 351.83 µs, with a minimum of 0s and maximum of 145.63 ms.
+- Average HTTP request duration: 85.31 ms, with a minimum of 358.3 µs and maximum of 362.33 ms.
+- Average expected response time: 85.31 ms, with a minimum of 358.3 µs and maximum of 362.33 ms.
+- No failed HTTP requests: 0% failure rate with 0 failed requests out of 34,925.
+- Average HTTP request receiving time: 128.74 µs, with a minimum of 0s and maximum of 90.03 ms.
+- Average HTTP request sending time: 57.48 µs, with a minimum of 0s and maximum of 89.1 ms.
 - No TLS handshaking time observed.
-- HTTP request waiting time: Average of 68.15 ms, with a minimum of 0s and maximum of 293.03 ms.
-- Total HTTP requests made: 43,763, with an average rate of 1454.344359/s.
-- Iteration duration: Average of 68.62 ms, with a minimum of 808 µs and maximum of 325.06 ms.
-- Total iterations: 43,763, with an average rate of 1454.344359/s.
+- Average HTTP request waiting time: 85.12 ms, with a minimum of 148 µs and maximum of 360.57 ms.
+- Total HTTP requests made: 34,925, with an average rate of 1159.801814/s.
+- Average iteration duration: 85.99 ms, with a minimum of 948.9 µs and maximum of 404.04 ms.
+- Total iterations: 34,925, with an average rate of 1159.801814/s.
 - Virtual Users (VUs): Consistently at 100 VUs throughout the test.
 - Maximum VUs reached: 100, with a minimum of 100 and maximum of 100.
 
-### Conclusion
+## Conclusion
 
-Based on the load test results, the following conclusions can be drawn:
+By comparing the two load tests, we can draw the following conclusions:
 
-- Using Worker Threads:
-  - The load test sent 726 HTTP requests, with an average rate of 22.440323/s.
-  - The total data sent was 86 kB, with a rate of 2.7 kB/s.
-  - The average duration for each request was 4.29 seconds.
-  - The expected response time matched the duration, averaging at 4.29 seconds.
-  - No failed requests were observed.
-  - The load test involved a range of virtual users, with a maximum of 100 VUs.
-  - The performance was consistent, with the maximum VUs consistently reached.
+1. Both implementations passed the load test with a status code of 200 for all requests.
+2. The load test using Worker Threads (Load Test 1) had a lower data transfer rate compared to the load test without using Worker Threads (Load Test 2).
+3. Load Test 1 had lower average HTTP request blocked time and connecting time compared to Load Test 2.
+4. Load Test 1 had lower average HTTP request duration and expected response time compared to Load Test 2.
+5. Load Test 2 had higher data received and data sent compared to Load Test 1.
+6. Load Test 2 had higher average HTTP request receiving time and sending time compared to Load Test 1.
+7. Both load tests had a 0% failure rate with no failed HTTP requests.
+8. Load Test 2 had a higher average HTTP request waiting time compared to Load Test 1.
+9. Load Test 1 had a higher average iteration duration compared to Load Test 2.
+10. Load Test 2 had a higher average iteration rate compared to Load Test 1.
+11. Both load tests utilized 100 virtual users (VUs) throughout the test, but Load Test 1 had a varying number of VUs ranging from 
 
-- Without Worker Threads:
-  - The load test sent 43,763 HTTP requests, with an average rate of 1454.344359/s.
-  - The total data received was 11 MB, with a rate of 365 kB/s.
-  - The average duration for each request was 68.29 ms.
-  - The expected response time matched the duration, averaging at 68.29 ms.
-  - No failed requests were observed.
-  - The load test was performed with a consistent 100 VUs.
-  - The performance was stable, with no significant variations observed.
+41 to 100.
 
-In conclusion, utilizing worker threads in the first code snippet (`multiple-requests1.js`) improved the performance of the prime number calculation task. It allowed for parallel execution, resulting in a faster response time and the ability to handle higher numbers of requests. The load test results showed better performance metrics compared to the second code snippet, which executed the task without worker threads.
-
+In conclusion, Load Test 1 using Worker Threads demonstrated better performance in terms of lower response times and lower resource utilization compared to Load Test 2 without using Worker Threads. However, Load Test 2 achieved a higher iteration rate, which indicates higher throughput. The choice between the two implementations depends on the specific requirements and trade-offs of the application under test.
 <br>
 <br>
 <p align="center">           
