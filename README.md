@@ -131,6 +131,35 @@ The load tests were conducted using two different methods: one with worker threa
 
 #### Load Test Results: Using Worker Threads
 
+
+
+
+```javascript
+  execution: local
+     script: Loadtest.js
+     output: -
+     data_sent......................: 86 kB   2.7 kB/s
+     http_req_blocked...............: avg=1.34ms   min=0s    med=0s    max=20.67ms  p(90)=4.14ms   p(95)=12.6ms
+     http_req_connecting............: avg=688.97µs min=0s    med=0s    max=19.4ms   p(90)=2.64ms   p(95)=6.1ms
+     http_req_duration..............: avg=4.29s    min=2.04s med=4.19s max=6.99s    p(90)=5.45s    p(95)=6.03s
+       { expected_response:true }...: avg=4.29s    min=2.04s med=4.19s max=6.99s    p(90)=5.45s    p(95)=6.03s
+     http_req_failed................: 0.00%   ✓ 0         ✗ 726
+     http_req_receiving.............: avg=406.5µs  min=0s    med=0s    max=213.6ms  p(90)=545.9µs  p(95)=1ms
+     http_req_sending...............: avg=1.11ms   min=0s    med=0s    max=653.99ms p(90)=514.29µs p(95)=1.02ms
+     http_req_tls_handshaking.......: avg=0s       min=0s    med=0s    max=0s       p(90)=0s       p(95)=0s
+     http_req_waiting...............: avg=4.29s    min=2.04s med=4.19s max=6.99s    p(90)=5.45s    p(95)=6.03s
+     http_reqs......................: 726     22.440323/s
+     iteration_duration.............: avg=4.29s    min=2.04s med=4.2s  max=7.02s    p(90)=5.45s    p(95)=6.03s
+     iterations.....................: 726     22.440323/s
+     vus............................: 19      min=19      max=100
+     vus_max........................: 100     min=100     max=100
+
+running (0m32.4s), 000/100 VUs, 726 complete and 0 interrupted iterations
+default ✓ [======================================] 100 VUs  30s
+```
+
+
+
 - Data sent: 86 kB at a rate of 2.7 kB/s.
 - HTTP request blocked time: Average of 1.34 ms, with a minimum of 0s and maximum of 20.67 ms.
 - HTTP request connecting time: Average of 688.97 µs, with a minimum of 0s and maximum of 19.4 ms.
@@ -148,6 +177,43 @@ The load tests were conducted using two different methods: one with worker threa
 - Maximum VUs reached: 100, with a minimum of 100 and maximum of 100.
 
 #### Load Test Results: Without Worker Threads
+
+
+
+```javascript
+execution: local
+     script: load-test.js
+     output: -
+
+  scenarios: (100.00%) 1 scenario, 100 max VUs, 1m0s max duration (incl. graceful stop):
+           * default: 100 looping VUs for 30s (gracefulStop: 30s)
+
+     ✓ is status 200
+     checks.........................: 100.00% ✓ 43763       ✗ 0
+     data_received..................: 11 MB   365 kB/s
+     data_sent......................: 5.2 MB  173 kB/s
+     http_req_blocked...............: avg=67.02µs min=0s      med=0s      max=43.66ms  p(90)=0s      p(95)=0s
+     http_req_connecting............: avg=50.72µs min=0s      med=0s      max=43ms     p(90)=0s      p(95)=0s
+     http_req_duration..............: avg=68.29ms min=292.1µs med=62.15ms max=293.99ms p(90)=90.59ms p(95)=100.63ms
+       { expected_response:true }...: avg=68.29ms min=292.1µs med=62.15ms max=293.99ms p(90)=90.59ms p(95)=100.63ms
+     http_req_failed................: 0.00%   ✓ 0           ✗ 43763
+     http_req_receiving.............: avg=88.89µs min=0s      med=0s      max=87.38ms  p(90)=512.9µs p(95)=549µs
+     http_req_sending...............: avg=49.71µs min=0s      med=0s      max=21.78ms  p(90)=0s      p(95)=517µs
+     http_req_tls_handshaking.......: avg=0s      min=0s      med=0s      max=0s       p(90)=0s      p(95)=0s
+     http_req_waiting...............: avg=68.15ms min=0s      med=62.03ms max=293.03ms p(90)=90.43ms p(95)=100.5ms
+     http_reqs......................: 43763   1454.344359/s
+     iteration_duration.............: avg=68.62ms min=808µs   med=62.4ms  max=325.06ms p(90)=90.85ms p(95)=101.02ms
+     iterations.....................: 43763   1454.344359/s
+     vus............................: 100     min=100       max=100
+     vus_max........................: 100     min=100       max=100
+
+
+running (0m30.1s), 000/100 VUs, 43763 complete and 0 interrupted iterations
+default ✓ [======================================] 100 VUs  30s
+```
+
+
+
 
 - Data received: 11 MB at a rate of 365 kB/s.
 - Data sent: 5.2 MB at a rate of 173 kB/s.
