@@ -3,7 +3,7 @@ import { check } from "k6";
 
 export default function () {
   const url = "http://localhost:4000/prime";
-  const payload = JSON.stringify({ num: 1000 });
+  const payload = JSON.stringify({ num: 10000 });
 
   const response = http.post(url, payload);
 
