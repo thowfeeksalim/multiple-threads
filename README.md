@@ -398,9 +398,102 @@ By comparing the two load tests, we can draw the following conclusions:
 10. Load Test 2 had a higher average iteration rate compared to Load Test 1.
 11. Both load tests utilized 100 virtual users (VUs) throughout the test, but Load Test 1 had a varying number of VUs ranging from 41 to 100.
 
-# conclusion
+```javascript
+Here is a comparison of the two scenarios in a table format:
 
-Load Test 1 using Worker Threads demonstrated better performance in terms of lower response times and lower resource utilization compared to Load Test 2 without using Worker Threads. However, Load Test 2 achieved a higher iteration rate, which indicates higher throughput. The choice between the two implementations depends on the specific requirements and trade-offs of the application under test.
+-----------------------------------------------------------------------------
+| Aspect                       | Using Worker Thread | Without Worker Thread |
+|------------------------------|---------------------|-----------------------|
+| Execution                    | Local               | Local                 |
+| Script                       | Loadtest.js         | load-test.js          |
+| Output                       | -                   | -                     |
+| Scenarios                    | 1                   | 1                     |
+| Max VUs                      | 100                 | 100                   |
+| Max Duration                 | 1m0s                | 1m0s                  |
+| Looping VUs                  | 100                 | 100                   |
+| Duration (Looping VUs)       | 30s                 | 30s                   |
+| Status 200                   | Yes                 | Yes                   |
+| Checks                       | 100.00% ✓ 646       | 100.00% ✓ 34925       |
+| Data Received                | 162 kB              | 8.8 MB                |
+| Data Sent                    | 77 kB               | 4.2 MB                |
+| Avg HTTP Req Blocked         | 2.69ms              | 386.69µs              |
+| Min HTTP Req Blocked         | 0s                  | 0s                    |
+| Med HTTP Req Blocked         | 0s                  | 0s                    |
+| Max HTTP Req Blocked         | 33.46ms             | 150.38ms              |
+| p(90) HTTP Req Blocked       | 13.3ms              | 0s                    |
+| p(95) HTTP Req Blocked       | 26.21ms             | 0s                    |
+| Avg HTTP Req Connecting      | 2.43ms              | 351.83µs              |
+| Min HTTP Req Connecting      | 0s                  | 0s                    |
+| Med HTTP Req Connecting      | 0s                  | 0s                    |
+| Max HTTP Req Connecting      | 30.42ms             | 145.63ms              |
+| p(90) HTTP Req Connecting    | 12.8ms              | 0s                    |
+| p(95) HTTP Req Connecting    | 19.77ms             | 0s                    |
+| Avg HTTP Req Duration        | 5.05s               | 85.31ms               |
+| Min HTTP Req Duration        | 2.63s               | 358.3µs               |
+| Med HTTP Req Duration        | 4.94s               | 73.03ms               |
+| Max HTTP Req Duration        | 7.87s               | 362.33ms              |
+| p(90) HTTP Req Duration      | 7.27s               | 136.64ms              |
+| p(95) HTTP Req Duration      | 7.69s               | 155.63ms              |
+| Avg HTTP Req Receiving       | 129.82µs            | 128.74µs              |
+| Min HTTP Req Receiving       | 0s                  | 0s                    |
+| Med HTTP Req Receiving       | 0s                  | 0s                    |
+| Max HTTP Req Receiving       | 4ms                 | 90.03ms               |
+| p(90) HTTP Req Receiving     | 974.05µs            | 516.59µs              |
+| p(95) HTTP Req Receiving     | 1ms                 | 565.87µs              |
+| Avg HTTP Req Sending         | 211.95µs            | 57.48µs               |
+| Min HTTP Req Sending         | 0s                  | 0s                    |
+| Med HTTP Req Sending         | 0s                  | 0s                    |
+| Max HTTP Req Sending         | 76.96ms             | 89.1ms                |
+| p(90) HTTP Req Sending       | 282.65µs            | 0s                    |
+| p(95) HTTP Req Sending       | 997.4µs             | 517.5µs               |
+| Avg HTTP Req TLS Handshaking | 0s                  | 0s                    |
+| Min HTTP Req TLS Handshaking | 0s                  | 0s                    |
+| Med HTTP Req TLS Handshaking | 0s                  | 0s                    |
+| Max HTTP Req TLS Handshaking | 0s                  | 0s                    |
+| p(90) HTTP Req TLS Handshaking | 0s                | 0s                    |
+| p(95) HTTP Req TLS Handshaking | 0s                | 0s                    |
+| Avg HTTP Req Waiting         | 5.05s               | 85.12ms               |
+| Min HTTP Req Waiting         | 2.63s               | 148µs                 |
+| Med HTTP Req Waiting         | 4.94s               | 72.87ms               |
+| Max HTTP Req Waiting         | 7.87s               | 360.57ms              |
+| p(90) HTTP Req Waiting       | 7.27s               | 136.35ms              |
+| p(95) HTTP Req Waiting       | 7.69s               | 154.8ms               |
+| HTTP Req Failed              | 0.00% ✓ 0          | 0.00% ✓ 34925         |
+| HTTP Reqs                    | 646                 | 34925                 |
+| Iteration Duration           | avg=5.06s           | avg=85.99ms           |
+| Min Iteration Duration       | 2.67s               | 948.9µs               |
+| Med Iteration Duration       | 4.95s               | 73.31ms               |
+| Max Iteration Duration       | 7.87s               | 404.04ms              |
+| p(90) Iteration Duration     | 7.27s               | 137.22ms              |
+| p(95) Iteration Duration     | 7.71s               | 156.68ms              |
+| Iterations                   | 646                 | 34925                 |
+| VUs                          | 41                  | 100                   |
+| Min VUs                      | 41                  | 100                   |
+| Max VUs                      | 100                 | 100                   |
+| VUs Max                      | 100                 | 100                   |
+------------------------------------------------------------------------------
+
+Here are the explanations of some terms mentioned in the comparison:
+
+1. Execution: Refers to the execution environment, which in this case is "local," indicating that the load testing is being performed on a local machine.
+2. Script: Specifies the name of the script being executed for the load testing. It is "Loadtest.js" in the scenario using a worker thread and "load-test.js" in the scenario without a worker thread.
+3. Scenarios: Indicates the number of load testing scenarios being executed. In both cases, there is one scenario.
+4. Max VUs: Represents the maximum number of virtual users (VUs) that can be simulated simultaneously. It is set to 100 in both scenarios.
+5. Max Duration: Defines the maximum duration allowed for the load testing, including a graceful stop. It is set to 1 minute (1m0s) in both scenarios.
+6. Looping VUs: Refers to the number of VUs that continuously loop through the load testing scenario. It is set to 100 in both scenarios.
+7. Checks: Represents the percentage of checks passed successfully during the load testing. It is measured in percentage and shows 100.00% in both scenarios.
+8. Data Received: Indicates the amount of data received during the load testing in kilobytes (kB) or megabytes (MB). It is 162 kB in the scenario with a worker thread and 8.8 MB in the scenario without a worker thread.
+9. Data Sent: Refers to the amount of data sent during the load testing in kilobytes (kB) or megabytes (MB). It is 77 kB in the scenario with a worker thread and 4.2 MB in the scenario without a worker thread.
+10. HTTP Req Duration: Represents the average duration of the HTTP requests made during the load testing. It is measured in seconds (s) and shows an average of 5.05s in the scenario with a worker thread and an average of 85.31ms (milliseconds) in the scenario without a worker thread.
+
+```
+# Conclusion:
+Comparing the two scenarios, it can be observed that the scenario using a worker thread performs better in terms of average HTTP request duration, with an average of 5.05 seconds. On the other hand, the scenario without a worker thread has a lower average HTTP request duration, with an average of 85.31 milliseconds.
+
+Additionally, the scenario without a worker thread handles a significantly higher volume of data, both in terms of data received and data sent. However, it is important to note that the scenario using a worker thread has a higher number of checks passed successfully, indicating a more reliable performance.
+
+Based on these observations, it can be concluded that the scenario using a worker thread may provide better overall performance and reliability, despite handling a smaller volume of data compared to the scenario without a worker thread. However, further analysis and consideration of specific requirements are necessary to determine the most suitable approach for a given load testing scenario.
+
 <br>
 <br>
 <p align="center">           
