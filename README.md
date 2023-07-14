@@ -27,6 +27,7 @@ This repository demonstrates the use of worker threads in Node.js to improve the
 The first code snippet (`multiple-requests1.js`) utilizes worker threads to perform the prime number calculation task in a parallel manner. Here's a breakdown of the code:
 
 ```javascript
+----------------------worker.js------------------------------
 const { Worker } = require("worker_threads");
 const express = require("express");
 const port = 4000;
@@ -72,6 +73,46 @@ app.post("/prime", async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+```
+```javascript
+const { parentPort, workerData } = require("worker_threads");
+//const fs = require("fs");
+
+function findPrimeNumbers(start, end) {
+  const primes = [];
+
+  for (let i = start; i <= end; i++) {
+    if (isPrimeNumber(i)) {
+      primes.push(i);
+    }
+  }
+
+  return primes;
+}
+
+function isPrimeNumber(num) {
+  if (num < 2) {
+    return false;
+  }
+
+  for (let i = 2; i <= Math.sqrt(num); i++) {
+    if (num % i === 0) {
+      return false;
+    }
+  }
+
+  return true;
+}
+
+const startTime = Date.now();
+
+const primes = findPrimeNumbers(workerData.start, workerData.end);
+const primeCount = primes.length;
+
+const executionTime = Date.now() - startTime;
+
+parentPort.postMessage(primeCount);
+parentPort.postMessage({ executionTime });
 ```
 
 This code sets up an Express server that listens for POST requests to the `/prime` endpoint. When a request is received, it extracts the input number, initializes variables for counting prime numbers and tracking execution time, and creates a worker thread using `Worker` from the `worker_threads` module. The worker thread runs the task in the separate JavaScript file `worker.js`. The main thread listens for messages from the worker and updates the `primeCount` and `executionTime` variables accordingly. Once the worker thread exits, the server responds with the `primeCount` value.
