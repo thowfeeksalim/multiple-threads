@@ -27,7 +27,7 @@ This repository demonstrates the use of worker threads in Node.js to improve the
 The first code snippet (`multiple-requests1.js`) utilizes worker threads to perform the prime number calculation task in a parallel manner. Here's a breakdown of the code:
 
 ```javascript
-----------------------worker.js------------------------------
+
 const { Worker } = require("worker_threads");
 const express = require("express");
 const port = 4000;
@@ -75,6 +75,9 @@ app.listen(port, () => {
 });
 ```
 ```javascript
+
+----------------------worker.js------------------------------
+
 const { parentPort, workerData } = require("worker_threads");
 //const fs = require("fs");
 
